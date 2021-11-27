@@ -15,8 +15,8 @@
 // Эту хрень нужно будет засунуть в базу данных
 let works=[
     {day:'пн',value:'work'},
-    {day:'пн',value:'dance'},
-    {day:'вт',value:'chill'}
+    // {day:'пн',value:'dance'},
+    // {day:'вт',value:'chill'}
 ]
 
 
@@ -46,9 +46,14 @@ const styles={
 
     job: {
 
-    border:'thick double #32a1ce',
-    color: '#222',
-    }  ,
+        border: 'thick double #32a1ce',
+        color: '#222',
+    },
+    jobOk: {
+
+        border: 'thick double #32a1ce',
+        color: 'red',
+    },
 }
 
 
@@ -64,11 +69,16 @@ function create_head(day)
         inpt.onkeypress=(ev)=>{
             if(ev.key==='Enter')
             {
-                console.log(ev.target.value)
-                works.push({day:day,value:ev.target.value})
-                let t=document.getElementById(day)
-                let old =create_txt(day)
-                t.innerHTML=old.innerHTML
+                if(ev.target.value)
+                {
+                    works.push({day:day, value:ev.target.value, checked:false })
+                    ev.target.value=''
+                    let jobs=document.getElementById(day)
+                    let old =create_txt(day)
+                    jobs.innerHTML=old.innerHTML    
+                }
+
+                
             }
         }
         p.appendChild(h1)
@@ -77,6 +87,38 @@ function create_head(day)
     return p
 }
 
+function co(ev)
+{
+    ev.getPar
+    console.log(ev.checked)
+    if(ev.checked){
+        Object.assign(ev.parentElement.parentElement.lastChild.style,styles.jobOk)}
+    else{
+        Object.assign(ev.parentElement.parentElement.lastChild.style,styles.job)
+    }
+    // ev.parentElement.parentElement.lastChild
+    // ev.target.parentElement
+
+}
+
+
+function create_job(value)
+{
+    var main=document.createElement("div")
+    let job=document.createElement("span")
+    let checkb=document.createElement("span")
+
+    let check=document.createElement("input")
+    check.type='checkbox'
+    checkb.innerHTML='<input type="checkbox" onclick="co(this);"}>'
+
+
+    job.innerHTML=value
+    Object.assign(job.style,styles.job)
+    main.appendChild(checkb)
+    main.appendChild(job)
+    return main
+}
 
 //колонка с заданиями под днём недели
 function create_txt(day)
@@ -87,11 +129,8 @@ function create_txt(day)
         console.log(days.day)
         if(days.day===day)
         {
-            let dd=document.createElement("p")
-            console.log("okl"+days.value)
-            dd.innerHTML=days.value
-            Object.assign(dd.style,styles.job)
-            d.appendChild(dd)
+
+            d.appendChild(create_job(days.value))
 
         }
     }
@@ -99,6 +138,7 @@ function create_txt(day)
     
     return d
 }
+
 
 
 
