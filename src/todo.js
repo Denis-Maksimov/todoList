@@ -2,10 +2,12 @@
  * 
  * foo
  *   |--> header
- *   |--> create_col [7]
+ *   |--> create_col [7] :будет слушать перетаскивание
  *        |
  *        |--> create_head
  *        |--> create_txt[n] <--works
+ *              |-->checkbox
+ *              |-->job
  *      
  *    
  ********************************/
@@ -18,6 +20,8 @@ let works=[
     // {day:'пн',value:'dance'},
     // {day:'вт',value:'chill'}
 ]
+
+let air
 
 
 
@@ -62,6 +66,7 @@ const styles={
 function create_head(day)
 {
     let p=document.createElement("p")
+    
         let h1=document.createElement("h1")
         h1.innerHTML=day
 
@@ -71,7 +76,7 @@ function create_head(day)
             {
                 if(ev.target.value)
                 {
-                    works.push({day:day, value:ev.target.value, checked:false })
+                    works.push({day:day, value:ev.target.value})
                     ev.target.value=''
                     let jobs=document.getElementById(day)
                     let old =create_txt(day)
@@ -81,6 +86,7 @@ function create_head(day)
                 
             }
         }
+ 
         p.appendChild(h1)
         p.appendChild(inpt)
         
@@ -90,7 +96,7 @@ function create_head(day)
 function co(ev)
 {
     ev.getPar
-    console.log(ev.checked)
+    // console.log(ev.checked)
     if(ev.checked){
         Object.assign(ev.parentElement.parentElement.lastChild.style,styles.jobOk)}
     else{
@@ -101,15 +107,30 @@ function co(ev)
 
 }
 
+function asd(evt)
+{
+    evt.target.classList.add(`.selected`);
+    air=evt.target
+    console.log("Iks");
+}
+
 
 function create_job(value)
 {
-    var main=document.createElement("div")
+    let main=document.createElement("div", ondragstart=(evt) => {
+        evt.target.classList.add(`.selected`);
+        air=evt.target
+        console.log("Iks");
+      })
+    
+    main.draggable=true;
+
+
     let job=document.createElement("span")
     let checkb=document.createElement("span")
 
-    let check=document.createElement("input")
-    check.type='checkbox'
+    // let check=document.createElement("input")
+    // check.type='checkbox'
     checkb.innerHTML='<input type="checkbox" onclick="co(this);"}>'
 
 
@@ -125,8 +146,9 @@ function create_txt(day)
 {
     let d=document.createElement("div")
     d.id=day
+    
     works.map((days)=>{
-        console.log(days.day)
+        // console.log(days.day)
         if(days.day===day)
         {
 
@@ -136,8 +158,26 @@ function create_txt(day)
     }
     );
     
+
     return d
 }
+
+
+
+const getNextElement = (cursorPosition, currentElement) => {
+    // Получаем объект с размерами и координатами
+    const currentElementCoord = currentElement.getBoundingClientRect();
+    // Находим вертикальную координату центра текущего элемента
+    const currentElementCenter = currentElementCoord.y + currentElementCoord.height / 2;
+  
+    // Если курсор выше центра элемента, возвращаем текущий элемент
+    // В ином случае — следующий DOM-элемент
+    const nextElement = (cursorPosition < currentElementCenter) ?
+        currentElement :
+        currentElement.nextElementSibling;
+  
+    return nextElement;
+  };
 
 
 
@@ -146,7 +186,43 @@ function create_txt(day)
 function create_col(day){
     let col=document.createElement("div")
     
+    col.classList.add(day);
+    col.className='.tasks__list '+day
+
+col.addEventListener(`dragover`, (evt) => {
+    // Разрешаем сбрасывать элементы в эту область
+    evt.preventDefault();
+  
+
+    // Находим элемент, над которым в данный момент находится курсор
+    const currentElement = evt.target;
     
+
+      if(currentElement.classList.contains(`.tasks__list`)){
+        console.log("->"+currentElement.classList[1]);
+      }
+
+  });
+
+  col.addEventListener(`drop`, (evt) => {
+    // Разрешаем сбрасывать элементы в эту область
+    evt.preventDefault();
+  
+
+    // Находим элемент, над которым в данный момент находится курсор
+    const currentElement = evt.target;
+    
+
+      if(currentElement.classList.contains(`.tasks__list`)){
+        console.log(air.lastChild.innerText+"->"+currentElement.classList[1]);
+        works.push({day:currentElement.classList[1], value:air.lastChild.innerText})
+        let jobs=document.getElementById(currentElement.classList[1])
+        let old =create_txt(currentElement.classList[1])
+        jobs.innerHTML=old.innerHTML
+      }
+
+  });
+
     let h=create_head(day)
     let t=create_txt(day)
     col.appendChild(h)
